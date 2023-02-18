@@ -4,40 +4,50 @@
 
 int main(int argc, char *argv[])
 {
-  uint firstPipe[2];
-  uint secondPipe[2];
+  int firstPipe[2];
+  int secondPipe[2];
+
   pipe(firstPipe);
   pipe(secondPipe);
-  const uint pid = fork();
-  const uint myPid = getpid();
+
+  const int pid = fork();
+  const int myPid = getpid();
+
   if (pid == 0)
   {
-    const uint readEnd = firstPipe[0];
-    const uint writeEnd = secondPipe[1];
+    const int readEnd = firstPipe[0];
+    const int writeEnd = secondPipe[1];
+    char buf[5];
+
     close(firstPipe[1]);
     close(secondPipe[0]);
-    char buf[5];
-    read(5, buf, readEnd);
+
+    read(readEnd, buf, 4);
     close(readEnd);
-    printf("%d received %s", &myPid, buf);
-    *buf = "pong";
-    write(5, buf, writeEnd);
+
+    printf("%d: received %s\n", myPid, buf);
+
+    strcpy(buf, "pong");
+    write(writeEnd, buf, 4);
     close(writeEnd);
   }
   else
   {
-    const uint readEnd = secondPipe[0];
-    const uint writeEnd = firstPipe[1];
+    const int readEnd = secondPipe[0];
+    const int writeEnd = firstPipe[1];
+    char buf[5] = "ping";
+
     close(firstPipe[0]);
     close(secondPipe[1]);
-    char buf[5] = "ping";
-    buf[4] = 0;
-    write(5, buf, writeEnd);
+
+    strcpy(buf, "ping");
+    write(writeEnd, buf, 4);
     close(writeEnd);
-    wait(0);
-    read(5, buf, readEnd);
+
+    read(readEnd, buf, 4);
     close(readEnd);
-    printf("%d received %s", &myPid, buf);
+
+    printf("%d: received %s\n", myPid, buf);
   }
   exit(0);
 }
