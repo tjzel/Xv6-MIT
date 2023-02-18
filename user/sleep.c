@@ -6,7 +6,7 @@ int
 main(int argc, char *argv[])
 {
   if (argc < 2) {
-    printf("Tick argument required!");
+    printf("Tick argument required!\n");
     exit(-1);
   }
   sleep(atoi(argv[1]));
